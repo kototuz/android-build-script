@@ -26,7 +26,10 @@ but the project doesn't use NDK. The project is a template for creating java and
 
 ## Setup
 
-Configure `build.sh` by changing this variables:
+There are `build_java.sh` and `build_kotlin.sh`. They don't depend on each other.
+If you want to write in java pick `build_java.sh`, in kotlin - `build_kotlin.sh`.
+The picked one you can rename to `build.sh` and another remove.
+Then configure your `build.sh` by changing this variables:
 
 > [!NOTE]
 > You must replace `ANDROID_HOME` with your path to sdk
@@ -60,5 +63,4 @@ To build the app (it means generate an apk file) just run this:
 > If `./build.sh` fails with error `Failure [INSTALL_FAILED_UPDATE_INCOMPATIBLE: Existing package com.example.project signatures do not match newer version; ignoring!]`.
 > You may fix it by `$ANDROID_HOME/platform-tools/adb uninstall <package_specified_in_the_error>`
 
-The main file is `src/<your_package>/MainActivity.java` (why is it so long?).
-You can start write your app there.
+The main file in `src/<your_package>/`. You can start write your app there.
