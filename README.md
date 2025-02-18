@@ -52,3 +52,7 @@ To build the app (it means generate an apk file) just run this:
 
 The main file is `src/com/template/project/MainActivity.java` (why is it so long?).
 You can start write your app there.
+
+> [!WARNING]
+> Your apps may conflict if they have the same package name.
+> So you should change the default package name `com.template.project` (don't forget change it in `AndroidManifest.xml`)
