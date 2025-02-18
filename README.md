@@ -15,28 +15,34 @@ but the project doesn't use NDK. The project is a template for creating java and
 
 - You need to have OpenJDK to create android apps. You can install it [here](https://openjdk.org)
 - `apksigner`. You can install it with `sudo apt install apksigner` (or something like that)
+- Android SDK
+    Install [Android command line toools](https://developer.android.com/studio/#command-tools). Unzip it, go to the `bin` folder and run this:
+    ``` console
+    ./sdkmanager --update --sdk_root=<path_to_sdk>
+    ./sdkmanager --install "build-tools;29.0.3" --sdk_root=<path_to_sdk>
+    ./sdkmanager --install "platform-tools" --sdk_root=<path_to_sdk>
+    ./sdkmanager --install "platforms;android-29" --sdk_root=<path_to_sdk>
+    ```
 
 ## Setup
 
-### Step 1
+Configure `build.sh` by changing this variables:
 
-Install [command line tools](https://developer.android.com/studio/#command-tools) (At the page bottom).
-After installing decompress the file into `sdk` folder. Make sure there is a `cmdline-tools` folder in the `sdk` folder. 
+> [!NOTE]
+> You must replace `ANDROID_HOME` with your path to sdk
 
-### Step 2
+``` console
+# Configuration
+ANDROID_HOME="sdk"
+APP_LABEL_NAME=Application
+APP_COMPANY_NAME=example
+APP_PRODUCT_NAME=project
+APP_KEYSTORE_PASS=$APP_PRODUCT_NAME
+```
 
-Just run this script it will install SDK and generate **keystore**:
-
-``` shell
-cd sdk/cmdline-tools/bin
-./sdkmanager --update --sdk_root=../..
-./sdkmanager --install "build-tools;29.0.3" --sdk_root=../..
-./sdkmanager --install "platform-tools" --sdk_root=../..
-./sdkmanager --install "platforms;android-29" --sdk_root=../..
-cd ../../..
-
-mkdir -p build
-keytool -genkeypair -validity 1000 -dname "CN=project,O=Android,C=ES" -keystore ./build/project.keystore -storepass 'project' -keypass 'project' -alias projectKey -keyalg RSA
+Setup the project:
+``` console
+./build.sh setup
 ```
 
 ## Usage
@@ -50,9 +56,9 @@ To build the app (it means generate an apk file) just run this:
 ./build.sh
 ```
 
-The main file is `src/com/template/project/MainActivity.java` (why is it so long?).
-You can start write your app there.
+> [!NOTE]
+> If `./build.sh` fails with error `Failure [INSTALL_FAILED_UPDATE_INCOMPATIBLE: Existing package com.example.project signatures do not match newer version; ignoring!]`.
+> You may fix it by `$ANDROID_HOME/platform-tools/adb uninstall <package_specified_in_the_error>`
 
-> [!WARNING]
-> Your apps may conflict if they have the same package name.
-> So you should change the default package name `com.template.project` (don't forget change it in `AndroidManifest.xml`)
+The main file is `src/<your_package>/MainActivity.java` (why is it so long?).
+You can start write your app there.
