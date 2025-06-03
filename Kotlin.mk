@@ -1,5 +1,6 @@
 # Settings ##############################
 ANDROID_HOME        = /home/i0ne/Programming/3rd-party/android/sdk
+JAVA_HOME           = /usr/lib/jvm/jdk-21.0.4-oracle-x64
 APP_LABEL           = Application
 COMPANY             = example
 PROJECT             = project
@@ -22,7 +23,7 @@ RESOURCE_OBJS = $(addsuffix .flat,$(subst res_,build/res/,$(subst /,_,$(RESOURCE
 all: build/$(KEYSTORE_PASS).keystore build/dex/kotlin-stdlib.dex $(RESOURCE_OBJS)
 	mkdir -p build/classes
 	kotlinc -jvm-target $(JVM_VERSION) -cp $(ANDROID_LIB):build/classes $(SRC_PATH) -d build/classes
-	javac -source $(JVM_VERSION) -target $(JVM_VERSION) $(SRC_PATH)/R.java -d build/classes
+	$(JAVA_HOME)/bin/javac -source $(JVM_VERSION) -target $(JVM_VERSION) $(SRC_PATH)/R.java -d build/classes
 	
 	mkdir -p build/dex
 	find build/classes -name *.class -printf "%p " | xargs $(BUILD_TOOLS)/d8 --lib $(ANDROID_LIB) --output build/dex build/dex/kotlin-stdlib.dex
@@ -51,7 +52,7 @@ build/dex/kotlin-stdlib.dex:
 # Create keystore-pass
 build/$(KEYSTORE_PASS).keystore:
 	mkdir -p build
-	keytool -genkeypair -validity 1000 -dname "CN=$(KEYSTORE_PASS),O=Android,C=ES" -keystore build/$(KEYSTORE_PASS).keystore -storepass $(KEYSTORE_PASS) -keypass $(KEYSTORE_PASS) -alias projectKey -keyalg RSA
+	$(JAVA_HOME)/bin/keytool -genkeypair -validity 1000 -dname "CN=$(KEYSTORE_PASS),O=Android,C=ES" -keystore build/$(KEYSTORE_PASS).keystore -storepass $(KEYSTORE_PASS) -keypass $(KEYSTORE_PASS) -alias projectKey -keyalg RSA
 
 
 # Generate basic manifest, activity, layout
