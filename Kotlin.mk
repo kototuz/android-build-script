@@ -37,12 +37,14 @@ BUILD_TOOLS   = $(ANDROID_HOME)/build-tools/$(BUILD_TOOLS_VERSION)
 SRC_PATH      = src/com/$(COMPANY)/$(PROJECT)
 PACKAGE_NAME  = com.$(COMPANY).$(PROJECT)
 ANDROID_LIB   = $(ANDROID_HOME)/platforms/android-$(API_VERSION)/android.jar
-RESOURCES     = $(shell find res -type f)
-RESOURCE_OBJS = $(addsuffix .flat,$(subst res_,build/res/,$(subst /,_,$(RESOURCES)))) 
 
 .PHONY: clean init
 
-all: build/$(KEYSTORE_PASS).keystore build/dex/kotlin-stdlib.dex $(RESOURCE_OBJS)
+all: build/$(KEYSTORE_PASS).keystore build/dex/kotlin-stdlib.dex
+	mkdir -p build/res
+	$(BUILD_TOOLS)/aapt2 compile $(shell find res -type f) -o build/res
+	$(BUILD_TOOLS)/aapt2 link -I $(ANDROID_LIB) --java src --manifest AndroidManifest.xml build/res/* -o build/$(PROJECT).apk
+	
 	mkdir -p build/classes
 	kotlinc -jvm-target $(JVM_VERSION) -cp $(ANDROID_LIB):build/classes $(SRC_PATH) -d build/classes
 	$(JAVA_HOME)/bin/javac -source $(JVM_VERSION) -target $(JVM_VERSION) $(SRC_PATH)/R.java -d build/classes
@@ -58,12 +60,6 @@ all: build/$(KEYSTORE_PASS).keystore build/dex/kotlin-stdlib.dex $(RESOURCE_OBJS
 	mv ./build/tmp.apk ./build/$(PROJECT).apk
 	
 	$(ANDROID_HOME)/platform-tools/adb install -r ./build/$(PROJECT).apk
-
-# Build resources: layouts, images, etc.
-$(RESOURCE_OBJS): $(RESOURCES)
-	mkdir -p build/res
-	$(BUILD_TOOLS)/aapt2 compile $(RESOURCES) -o build/res
-	$(BUILD_TOOLS)/aapt2 link -I $(ANDROID_LIB) --java src --manifest AndroidManifest.xml build/res/* -o build/$(PROJECT).apk
 
 # Build kotlin stdlib. Android has only java stdlib
 build/dex/kotlin-stdlib.dex:

@@ -36,12 +36,14 @@ BUILD_TOOLS   = $(ANDROID_HOME)/build-tools/$(BUILD_TOOLS_VERSION)
 SRC_PATH      = src/com/$(COMPANY)/$(PROJECT)
 PACKAGE_NAME  = com.$(COMPANY).$(PROJECT)
 ANDROID_LIB   = $(ANDROID_HOME)/platforms/android-$(API_VERSION)/android.jar
-RESOURCES     = $(shell find res -type f)
-RESOURCE_OBJS = $(addsuffix .flat,$(subst res_,build/res/,$(subst /,_,$(RESOURCES)))) 
 
 .PHONY: clean init
 
-all: build/$(KEYSTORE_PASS).keystore $(RESOURCE_OBJS)
+all: build/$(KEYSTORE_PASS).keystore
+	mkdir -p build/res
+	$(BUILD_TOOLS)/aapt2 compile $(shell find res -type f) -o build/res
+	$(BUILD_TOOLS)/aapt2 link -I $(ANDROID_LIB) --java src --manifest AndroidManifest.xml build/res/* -o build/$(PROJECT).apk
+	
 	mkdir -p build/classes
 	$(JAVA_HOME)/bin/javac -source $(JVM_VERSION) -target $(JVM_VERSION) -classpath $(ANDROID_LIB) $(shell find $(SRC_PATH) -name *.java) -d build/classes
 	
@@ -56,12 +58,6 @@ all: build/$(KEYSTORE_PASS).keystore $(RESOURCE_OBJS)
 	mv ./build/tmp.apk ./build/$(PROJECT).apk
 	
 	$(ANDROID_HOME)/platform-tools/adb install -r ./build/$(PROJECT).apk
-
-# Build resources: layouts, images, etc.
-$(RESOURCE_OBJS): $(RESOURCES)
-	mkdir -p build/res
-	$(BUILD_TOOLS)/aapt2 compile $(RESOURCES) -o build/res
-	$(BUILD_TOOLS)/aapt2 link -I $(ANDROID_LIB) --java src --manifest AndroidManifest.xml build/res/* -o build/$(PROJECT).apk
 
 # Create keystore-pass
 build/$(KEYSTORE_PASS).keystore:
